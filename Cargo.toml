@@ -1,0 +1,14 @@
+[package]
+name = "netns-proxy"
+version = "0.1.0"
+edition = "2018"
+description = "Forwards incoming requests to a given target while outgoing connections are created from different namespace"
+
+[dependencies]
+anyhow = "1"
+clap = "3.0.0-beta.2"
+nix = "0.20.0"
+tokio = { version = "1.6.0", features = [ "full" ]}
+async-trait = "0.1"
+#futures = "0.3.15"
+

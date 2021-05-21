@@ -1,0 +1,10 @@
+/target
+/*/target
+**/*.rs.bk
+
+/.cargo
+
+/.idea
+/*.iml
+
+/.envrc
