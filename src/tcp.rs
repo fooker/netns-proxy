@@ -3,9 +3,11 @@ use std::net::SocketAddr;
 use anyhow::{Context, Result};
 use async_trait::async_trait;
 use tokio::net::{TcpListener, TcpStream};
+use tracing::{debug, Level, span, trace, warn};
 
+#[derive(Debug)]
 pub struct Proxy {
-    socket:  TcpListener,
+    socket: TcpListener,
 }
 
 #[async_trait]
@@ -13,22 +15,38 @@ impl super::Proxy for Proxy {
     async fn listen(bind: SocketAddr) -> Result<Self> {
         let socket = TcpListener::bind(bind).await
             .with_context(|| format!("Failed to bind to TCP socket: {}", bind))?;
+        debug!("Created TCP socket");
 
         return Ok(Self {
             socket
-        })
+        });
     }
 
     async fn run(mut self: Box<Self>, target: SocketAddr) -> Result<()> {
         loop {
             let result: Result<()> = (|| async {
-                let (mut client, _) = self.socket.accept().await
+                trace!("Awaiting new connection");
+
+                let (mut client, remote) = self.socket.accept().await
                     .context("Failed to accept connection")?;
+                debug!("New client connected: {}", remote);
 
-                let mut remote = TcpStream::connect(target).await
+                let _ = span!(Level::DEBUG, "Client connection", connection = ?remote).entered();
+
+                let mut upstream = TcpStream::connect(target).await
                     .with_context(|| format!("Failed to connect to target: {}", target))?;
+                trace!("Upstream connection established");
 
-                tokio::io::copy_bidirectional(&mut client, &mut remote).await?;
+                tokio::spawn(async move {
+                    match tokio::io::copy_bidirectional(&mut client, &mut upstream).await {
+                        Ok(_) => {
+                            trace!("Upstream connection closed");
+                        }
+                        Err(err) => {
+                            warn!("Upstream connection failed: {}", err);
+                        }
+                    }
+                });
 
                 return Ok(());
             })().await;
