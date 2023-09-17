@@ -39,26 +39,25 @@ impl fmt::Display for Proto {
 }
 
 #[derive(Parser, Debug)]
-// #[clap(setting = AppSettings::ColoredHelp)]
-#[command(author, version, about, long_about = None)]
+#[clap(author, version, about, long_about = None)]
 #[deny(missing_docs)]
 struct Opts {
     /// The namespace to open connections from. Can be namespace name or full path
     netns: PathBuf,
 
     /// The network protocol to use
-    #[arg(short, long, value_enum, default_value = "tcp")]
+    #[clap(short, long, value_enum, default_value = "tcp")]
     proto: Proto,
 
     /// Target to forward requests to
     target: SocketAddr,
 
     /// Listen on incoming requests
-    #[arg(short, long)]
+    #[clap(short, long)]
     bind: Option<SocketAddr>,
 
     /// Verbose mode
-    #[arg(short, long, action = clap::ArgAction::Count)]
+    #[clap(short, long, action = clap::ArgAction::Count)]
     verbose: u8,
 }
 
