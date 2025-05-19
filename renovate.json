@@ -3,6 +3,6 @@
   "extends": [
     "config:recommended",
     ":automergeMinor",
-    ":semanticCommitsTypeAll(chore)"
+    ":semanticCommitTypeAll(chore)"
   ]
 }
