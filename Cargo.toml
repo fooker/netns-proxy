@@ -6,7 +6,7 @@ description = "Forwards incoming requests to a given target while outgoing conne
 
 [dependencies]
 anyhow = "1.0.98"
-clap = { version = "3", features = ["derive"] }
+clap = { version = "4.5.38", features = ["derive"] }
 nix = { version = "0.30.1", features = ["user", "sched", "fs"] }
 tokio = { version = "1.45.0", features = ["full"] }
 async-trait = "*"
