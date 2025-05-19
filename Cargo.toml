@@ -13,10 +13,10 @@ homepage = "https://github.con/fooker/netns-proxy"
 readme = "./README.md"
 
 keywords = [
-  "linux"
-  "netns"
-  "proxy"
-  "namespace"
+  "linux",
+  "netns",
+  "proxy",
+  "namespace",
 ]
 
 [dependencies]
