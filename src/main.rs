@@ -1,7 +1,6 @@
 use std::fmt;
 use std::fmt::{Debug};
 use std::net::{Ipv6Addr, SocketAddr};
-use std::os::unix::io::AsRawFd;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
@@ -91,7 +90,6 @@ async fn main() -> Result<()> {
 
     let netns = tokio::fs::File::open(&netns).await
         .with_context(|| format!("Could not open network namespace file: {:?}", netns))?;
-    let netns = netns.as_raw_fd();
 
     setns(netns, CloneFlags::CLONE_NEWNET)
         .context("Switching network namespace failed")?;

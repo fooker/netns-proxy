@@ -8,11 +8,11 @@ pub struct Proxy {}
 
 #[async_trait]
 impl super::Proxy for Proxy {
-    async fn listen(bind: SocketAddr) -> Result<Self> {
+    async fn listen(_bind: SocketAddr) -> Result<Self> {
         unimplemented!()
     }
 
-    async fn run(mut self: Box<Self>, target: SocketAddr) -> Result<()> {
+    async fn run(mut self: Box<Self>, _target: SocketAddr) -> Result<()> {
         todo!()
     }
 }
