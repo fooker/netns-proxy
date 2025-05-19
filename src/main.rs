@@ -23,6 +23,7 @@ pub trait Proxy: Debug {
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum, Debug)]
+#[allow(clippy::upper_case_acronyms)]
 enum Proto {
     TCP,
     UDP,
@@ -31,11 +32,11 @@ enum Proto {
 
 impl fmt::Display for Proto {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        return f.write_str(match self {
+        f.write_str(match self {
             Proto::TCP => "tcp",
             Proto::UDP => "udp",
             Proto::SCTP => "sctp",
-        });
+        })
     }
 }
 
@@ -94,7 +95,7 @@ async fn main() -> Result<()> {
 
     let netns = tokio::fs::File::open(&netns)
         .await
-        .with_context(|| format!("Could not open network namespace file: {:?}", netns))?;
+        .with_context(|| format!("Could not open network namespace file: {netns:?}"))?;
 
     setns(netns, CloneFlags::CLONE_NEWNET).context("Switching network namespace failed")?;
     trace!("Network namespace switched");

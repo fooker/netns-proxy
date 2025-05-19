@@ -15,7 +15,7 @@ impl super::Proxy for Proxy {
     async fn listen(bind: SocketAddr) -> Result<Self> {
         let socket = TcpListener::bind(bind)
             .await
-            .with_context(|| format!("Failed to bind to TCP socket: {}", bind))?;
+            .with_context(|| format!("Failed to bind to TCP socket: {bind}"))?;
         debug!("Created TCP socket");
 
         return Ok(Self { socket });
@@ -23,7 +23,7 @@ impl super::Proxy for Proxy {
 
     async fn run(mut self: Box<Self>, target: SocketAddr) -> Result<()> {
         loop {
-            let result: Result<()> = (|| async {
+            let result: Result<()> = async {
                 trace!("Awaiting new connection");
 
                 let (mut client, remote) = self
@@ -37,7 +37,7 @@ impl super::Proxy for Proxy {
 
                 let mut upstream = TcpStream::connect(target)
                     .await
-                    .with_context(|| format!("Failed to connect to target: {}", target))?;
+                    .with_context(|| format!("Failed to connect to target: {target}"))?;
                 trace!("Upstream connection established");
 
                 tokio::spawn(async move {
@@ -51,12 +51,12 @@ impl super::Proxy for Proxy {
                     }
                 });
 
-                return Ok(());
-            })()
+                Ok(())
+            }
             .await;
 
             if let Err(err) = result {
-                eprintln!("Error: {:?}", err);
+                eprintln!("Error: {err:?}");
             }
         }
     }

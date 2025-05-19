@@ -93,7 +93,7 @@ impl super::Proxy for Proxy {
                                     }
                                 }
 
-                                return Ok::<(), anyhow::Error>(());
+                                Ok::<(), anyhow::Error>(())
                             });
                         }
 
