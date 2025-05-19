@@ -1,22 +1,24 @@
 use std::fmt;
-use std::fmt::{Debug};
+use std::fmt::Debug;
 use std::net::{Ipv6Addr, SocketAddr};
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use async_trait::async_trait;
 use clap::{Parser, ValueEnum};
-use nix::sched::{CloneFlags, setns};
-use nix::unistd::{Gid, setgid, setuid, Uid};
-use tracing::{debug, info, Level, trace};
+use nix::sched::{setns, CloneFlags};
+use nix::unistd::{setgid, setuid, Gid, Uid};
+use tracing::{debug, info, trace, Level};
 
+mod sctp;
 mod tcp;
 mod udp;
-mod sctp;
 
 #[async_trait]
 pub trait Proxy: Debug {
-    async fn listen(bind: SocketAddr) -> Result<Self> where Self: Sized;
+    async fn listen(bind: SocketAddr) -> Result<Self>
+    where
+        Self: Sized;
     async fn run(self: Box<Self>, target: SocketAddr) -> Result<()>;
 }
 
@@ -74,7 +76,9 @@ async fn main() -> Result<()> {
         .init();
 
     // Open listening socket for proxy in current namespace
-    let bind = opts.bind.unwrap_or_else(|| SocketAddr::new(Ipv6Addr::UNSPECIFIED.into(), opts.target.port()));
+    let bind = opts
+        .bind
+        .unwrap_or_else(|| SocketAddr::new(Ipv6Addr::UNSPECIFIED.into(), opts.target.port()));
     info!("Listening on {}:{}", opts.proto, bind);
 
     let proxy: Box<dyn Proxy> = match opts.proto {
@@ -88,19 +92,17 @@ async fn main() -> Result<()> {
     let netns = Path::new("/var/run/netns").join(opts.netns);
     debug!("Using netns: {}", netns.display());
 
-    let netns = tokio::fs::File::open(&netns).await
+    let netns = tokio::fs::File::open(&netns)
+        .await
         .with_context(|| format!("Could not open network namespace file: {:?}", netns))?;
 
-    setns(netns, CloneFlags::CLONE_NEWNET)
-        .context("Switching network namespace failed")?;
+    setns(netns, CloneFlags::CLONE_NEWNET).context("Switching network namespace failed")?;
     trace!("Network namespace switched");
 
     // Dropping privileges
-    setgid(Gid::current())
-        .context("Failed to drop group privileges")?;
+    setgid(Gid::current()).context("Failed to drop group privileges")?;
     trace!("Group privileges dropped");
-    setuid(Uid::current())
-        .context("Failed to drop user privileges")?;
+    setuid(Uid::current()).context("Failed to drop user privileges")?;
     trace!("User privileges dropped");
 
     // Start forwarding incoming connections

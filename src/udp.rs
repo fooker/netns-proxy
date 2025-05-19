@@ -8,7 +8,7 @@ use anyhow::{bail, Context, Result};
 use async_trait::async_trait;
 use tokio::net::UdpSocket;
 use tokio::sync::Mutex;
-use tracing::{debug, error, Level, span, trace};
+use tracing::{debug, error, span, trace, Level};
 
 const BUFFER_SIZE: usize = 64 * 1024;
 const TIMEOUT: Duration = Duration::from_secs(120);
@@ -24,9 +24,7 @@ impl super::Proxy for Proxy {
         let socket = Arc::new(UdpSocket::bind(bind).await?);
         debug!("Created UDP socket");
 
-        return Ok(Self {
-            socket,
-        });
+        return Ok(Self { socket });
     }
 
     async fn run(mut self: Box<Self>, target: SocketAddr) -> Result<()> {
@@ -48,8 +46,11 @@ impl super::Proxy for Proxy {
                     Entry::Vacant(entry) => {
                         debug!("New UDP session: {}", remote);
 
-                        let upstream = Arc::new(UdpSocket::bind(SocketAddr::new(Ipv6Addr::UNSPECIFIED.into(), 0)).await
-                            .context("Failed to bind upstream socket")?);
+                        let upstream = Arc::new(
+                            UdpSocket::bind(SocketAddr::new(Ipv6Addr::UNSPECIFIED.into(), 0))
+                                .await
+                                .context("Failed to bind upstream socket")?,
+                        );
                         upstream.connect(target).await?;
                         trace!("Upstream socket created: {}", upstream.local_addr()?);
 
@@ -64,12 +65,16 @@ impl super::Proxy for Proxy {
                                 loop {
                                     trace!("Waiting for next packet");
 
-                                    match tokio::time::timeout(TIMEOUT, upstream.recv(&mut buffer)).await {
+                                    match tokio::time::timeout(TIMEOUT, upstream.recv(&mut buffer))
+                                        .await
+                                    {
                                         Ok(Ok(size)) => {
                                             trace!("Packet received from upstream: {}", size);
                                             trace!("Responding to: {}", remote);
 
-                                            socket.send_to(&buffer[0..size], &remote).await
+                                            socket
+                                                .send_to(&buffer[0..size], &remote)
+                                                .await
                                                 .context("Failed to send response")?;
                                         }
 
@@ -81,8 +86,7 @@ impl super::Proxy for Proxy {
                                         Err(_) => {
                                             trace!("UDP session timeout");
 
-                                            conn_track.lock().await
-                                                .remove(&remote);
+                                            conn_track.lock().await.remove(&remote);
 
                                             break;
                                         }
