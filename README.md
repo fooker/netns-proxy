@@ -20,16 +20,57 @@ allows the accepting socket to exist in the original namespace while forwarded
 connection happen in the specified namespace.
 
 
+## Installation
+
+You can install the latest released version directly from [crates.io]:
+
+```bash
+cargo install netns-proxy
+```
+
+
+## How to Build
+
+### Prerequisites
+
+* Rust toolchain (rustc ≥ 1.60, cargo)
+* Linux with setns(2) support (kernel ≥ 3.0)
+* (Optional) Nix if you prefer reproducible builds
+
+### From Source
+
+```bash
+# Clone the source
+git clone https://github.com/fooker/netns-proxy.git
+cd netns-proxy
+
+cargo build --release
+```
+
+The binary will be in `target/release/netns-proxy`.
+
+### With nix
+
+Requires [nix](https://nixos.org/).
+
+```bash
+# Clone the source
+git clone https://github.com/fooker/netns-proxy.git
+cd netns-proxy
+
+nix-build
+```
+
+
 ## Usage
 
 ```
-netns-proxy <netns> <target>
+netns-proxy [OPTIONS] <netns> <target>
 ```
 
-`<netns>` is the name of the network namespace from which forwarded connections
+* `<netns>` is the name of the network namespace from which forwarded connections
 are created.
-
-`<target>` the target host and port to forward connections to.
+* `<target>` the target host and port to forward connections to.
 
 See `netns-proxy --help` for full details and options.
 
