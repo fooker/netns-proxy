@@ -9,7 +9,7 @@ authors = [
 
 license = "MIT"
 
-homepage = "https://github.con/fooker/netns-proxy"
+repository = "https://github.com/fooker/netns-proxy"
 readme = "./README.md"
 
 keywords = [
