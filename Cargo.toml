@@ -22,7 +22,7 @@ keywords = [
 [dependencies]
 anyhow = "1.0.98"
 clap = { version = "4.5.38", features = ["derive"] }
-nix = { version = "0.30.1", features = ["user", "sched", "fs"] }
+nix = { version = "0.31.0", features = ["user", "sched", "fs"] }
 tokio = { version = "1.45.0", features = ["full"] }
 async-trait = "0.1.88"
 tracing = "0.1.41"
