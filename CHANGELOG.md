@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2](https://github.com/fooker/netns-proxy/compare/v0.2.1...v0.2.2) - 2026-01-28
+
+### Other
+
+- *(deps)* update rust crate clap to v4.5.55 ([#54](https://github.com/fooker/netns-proxy/pull/54))
+- *(deps)* update rust crate nix to v0.31.1 ([#53](https://github.com/fooker/netns-proxy/pull/53))
+- *(deps)* update rust crate nix to 0.31.0 ([#52](https://github.com/fooker/netns-proxy/pull/52))
+
 ## [0.2.1](https://github.com/fooker/netns-proxy/compare/v0.2.0...v0.2.1) - 2025-06-20
 
 ### Added
